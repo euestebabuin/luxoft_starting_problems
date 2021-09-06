@@ -14,4 +14,4 @@ void print_list(sl_list *L);
 
 int sort_list(sl_list *L);
 
-void flush_list(sl_list *L);
+int flush_list(sl_list **L);

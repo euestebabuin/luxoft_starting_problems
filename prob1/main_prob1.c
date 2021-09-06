@@ -37,14 +37,13 @@ int main(int argc, char *argv[]){
 	add_node(&test, 12);
 	add_node(&test, 8);
 	add_node(&test, 4);
+	sort_list(test);
 	print_list(test);
-	delete_node(&test, 8);
+	delete_node(&test, -3);
 	print_list(test);
-	delete_node(&test, -2);
+	delete_node(&test, 12);
 	print_list(test);
-	delete_node(&test, 5);
-	print_list(test);
-	delete_node(&test, 4);
+	flush_list(&test);
 	print_list(test);
 	return 0;
 }

@@ -73,10 +73,49 @@ void print_list(sl_list *L){
 }
 
 int sort_list(sl_list *L){
+	sl_list *l_traverse_a, *l_traverse_b;
+	int aux;
+
+	if (L == NULL || L->next == NULL)
+		return 1;
 	
+	l_traverse_a = L;
+
+	while (l_traverse_a->next != NULL){
+		l_traverse_b = l_traverse_a->next;
+		while (l_traverse_b != NULL){
+			if (l_traverse_a->val > l_traverse_b->val){
+				aux = l_traverse_a->val;
+				l_traverse_a->val = l_traverse_b->val;
+				l_traverse_b->val = aux;
+			}
+			l_traverse_b = l_traverse_b->next;
+		}
+		l_traverse_a = l_traverse_a->next;
+	}
+
+		
 	return 0;
 }
 
-void flush_list(sl_list *L){
+int flush_list(sl_list **L){
+	sl_list *next_node, *delete_node;
 
+	if (L == NULL)
+		return -1;
+	if (*L == NULL)
+		return 0;
+
+	delete_node = *L;
+	next_node = (*L)->next;
+	*L = NULL;
+
+	while(delete_node != NULL){
+		free(delete_node);
+		delete_node = next_node;
+		if (next_node != NULL){
+			next_node = next_node->next;
+		}
+	}
+	return 0;
 }
