@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <pthread.h>
+#include "sl_api.h"
 
 void printer(void *arg){
 	printf("%s\n", (char*) arg);
@@ -15,7 +16,7 @@ void *mythread(void *arg){
 }
 
 int main(int argc, char *argv[]){
-	pthread_t p1, p2;
+/*	pthread_t p1, p2;
 
 	printf("start\n");
 	
@@ -29,6 +30,21 @@ int main(int argc, char *argv[]){
 	printf("end\n");
 
 	receiver(&printer, "salut salut da da da");
-
+*/
+	sl_list *test = NULL;
+	add_node(&test, 5);
+	add_node(&test, -3);
+	add_node(&test, 12);
+	add_node(&test, 8);
+	add_node(&test, 4);
+	print_list(test);
+	delete_node(&test, 8);
+	print_list(test);
+	delete_node(&test, -2);
+	print_list(test);
+	delete_node(&test, 5);
+	print_list(test);
+	delete_node(&test, 4);
+	print_list(test);
 	return 0;
 }
