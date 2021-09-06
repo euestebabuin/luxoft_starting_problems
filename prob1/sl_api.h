@@ -15,3 +15,7 @@ void print_list(sl_list *L);
 int sort_list(sl_list *L);
 
 int flush_list(sl_list **L);
+
+void start_list_work();
+
+void stop_list_work();

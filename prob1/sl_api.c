@@ -1,9 +1,20 @@
 #include "sl_api.h"
-#include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
+#include <stdio.h>
 
 static void print_node(int val){
 	printf("|%d|->", val);
+}
+
+static pthread_mutex_t list_lock;
+
+void start_list_work(){
+	pthread_mutex_init(&list_lock, NULL);
+}
+
+void stop_list_work(){
+	pthread_mutex_destroy(&list_lock);
 }
 
 //we need double indirection for the case when we are adding the first node
@@ -19,8 +30,9 @@ int add_node(sl_list **L, int new_val){
 	new_node->callback_print = &print_node;
 	new_node->next = NULL;
 
+	pthread_mutex_lock(&list_lock);
 	if (*L == NULL){
-		*L = new_node;
+		*L = new_node;	
 	}
 	else{
 		l_traverse = *L;
@@ -29,6 +41,8 @@ int add_node(sl_list **L, int new_val){
 		}
 		l_traverse->next = new_node;
 	}
+	pthread_mutex_unlock(&list_lock);
+
 	return 0;
 }
 
@@ -41,10 +55,13 @@ int delete_node(sl_list **L, int val){
 	if (*L == NULL)
 		return -2;
 
+	pthread_mutex_lock(&list_lock);
 	if ((*L)->val == val){
 		l_delete = *L;
 		(*L)= (*L)->next;
 		free(l_delete);
+		pthread_mutex_unlock(&list_lock);
+		return 0;
 	}
 	else{
 		l_traverse = *L;
@@ -52,24 +69,27 @@ int delete_node(sl_list **L, int val){
 			l_traverse = l_traverse->next;
 		}
 		if (l_traverse->next == NULL){
+			pthread_mutex_unlock(&list_lock);
 			return -3;
 		}
 		else{
 			l_delete = l_traverse->next;
 			l_traverse->next = l_delete->next;
 			free(l_delete);
+			pthread_mutex_unlock(&list_lock);
 			return 0;
 		}
 	}
-	return 0;
 }
 
 void print_list(sl_list *L){
+	pthread_mutex_lock(&list_lock);
 	while(L != NULL){
 		(L->callback_print)(L->val);
 		L = L->next;	
 	}
 	printf(" (/)\n");
+	pthread_mutex_unlock(&list_lock);
 }
 
 int sort_list(sl_list *L){
@@ -79,8 +99,8 @@ int sort_list(sl_list *L){
 	if (L == NULL || L->next == NULL)
 		return 1;
 	
+	pthread_mutex_lock(&list_lock);
 	l_traverse_a = L;
-
 	while (l_traverse_a->next != NULL){
 		l_traverse_b = l_traverse_a->next;
 		while (l_traverse_b != NULL){
@@ -93,7 +113,7 @@ int sort_list(sl_list *L){
 		}
 		l_traverse_a = l_traverse_a->next;
 	}
-
+	pthread_mutex_unlock(&list_lock);
 		
 	return 0;
 }
@@ -106,10 +126,10 @@ int flush_list(sl_list **L){
 	if (*L == NULL)
 		return 0;
 
+	pthread_mutex_lock(&list_lock);
 	delete_node = *L;
 	next_node = (*L)->next;
 	*L = NULL;
-
 	while(delete_node != NULL){
 		free(delete_node);
 		delete_node = next_node;
@@ -117,5 +137,7 @@ int flush_list(sl_list **L){
 			next_node = next_node->next;
 		}
 	}
+	pthread_mutex_unlock(&list_lock);
+
 	return 0;
 }
